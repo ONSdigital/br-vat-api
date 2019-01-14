@@ -157,7 +157,7 @@ object QueryVatAcceptanceSpec extends HBaseJsonRequestBuilder with HBaseJsonBody
     sic = "10020",
     recordType = "2",
     turnover = Some(Turnover(
-      amount = Some(1000),
+      amount = 1000,
       date = Some("31/03/2016"),
     )),
     lifespan = Some(Lifespan(

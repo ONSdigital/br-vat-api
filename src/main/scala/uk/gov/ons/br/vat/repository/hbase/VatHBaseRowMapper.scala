@@ -2,11 +2,9 @@ package uk.gov.ons.br.vat.repository.hbase
 
 import org.slf4j.Logger
 import uk.gov.ons.br.models.{Address, Lifespan, LinkToLegalUnit}
-import uk.gov.ons.br.repository.Field
 import uk.gov.ons.br.repository.Field._
 import uk.gov.ons.br.repository.hbase.HBaseRow.asFields
 import uk.gov.ons.br.repository.hbase.{HBaseColumn, HBaseRow, HBaseRowMapper}
-import uk.gov.ons.br.vat.models
 import uk.gov.ons.br.vat.models.{Turnover, Vat, VatRef}
 
 import scala.util.Try
@@ -66,7 +64,6 @@ private[hbase] object Columns {
   object Links {
     val ubrn = columnNameForQualifier("ubrn")
   }
-
 }
 
 object VatHBaseRowMapper extends HBaseRowMapper[Vat] {
@@ -87,7 +84,7 @@ object VatHBaseRowMapper extends HBaseRowMapper[Vat] {
       optTurnover <- tryToTurnover(fields).toOption
       address <- toAddress(fields)
       optLinks = toLinks(fields)
-    } yield models.Vat(
+    } yield Vat(
       VatRef(vatref),
       name,
       address,
@@ -113,16 +110,12 @@ object VatHBaseRowMapper extends HBaseRowMapper[Vat] {
   private def tryToTurnover(fields: Map[String, String])(implicit logger: Logger): Try[Option[Turnover]] = {
     import Columns.Turnover._
     for {
-      amount <- optionalIntNamed(amount).apply(fields)
+      optAmount <- optionalIntNamed(amount).apply(fields)
+    } yield for {
+      amount <- optAmount
       optDate = optionalStringNamed(date).apply(fields)
     } yield Turnover(amount, optDate)
   }
-
-  def whenExistsNonEmpty[A, B, C](a: Option[A], b: Option[B])
-                                 (c: (Option[A], Option[B]) => C): Option[C] =
-    Field.whenExistsNonEmpty(a, b, None, None, None) { (a, b, _, _, _) =>
-      c(a, b)
-    }
 
   private def toAddress(fields: Map[String, String])(implicit logger: Logger): Option[Address] = {
     import Columns.Address._

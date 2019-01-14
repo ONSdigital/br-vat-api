@@ -86,7 +86,7 @@ class VatHBaseRowMapperSpec extends UnitSpec with MockFactory {
           underTest.fromRow(sampleVatRowWith(MandatoryCells ++ Seq(Name1Cell, Name2Cell, Name3Cell))) shouldBe Some(minimalVatWithName)
         }
       }
-      TurnoverCell
+
       "building the 'tradingStyle' value from multiple columns" - {
         "using 'tradstyle1' when it is the only trading style column defined" in new Fixture {
           val vatWithTradingStyle1 = SampleVatUnitWithAllFields.copy(tradingStyle = Some(TradingStyle1Cell.value))
@@ -151,11 +151,11 @@ class VatHBaseRowMapperSpec extends UnitSpec with MockFactory {
         underTest.fromRow(sampleVatRowWith(cellsIncludingPartialLifespan)) shouldBe Some(vatWithIncompleteLifespan)
       }
 
-      "when turnover is only partially populated" in new Fixture {
+      "when turnover is only partially populated (with amount)" in new Fixture {
         val cellsIncludingPartialTurnover = MandatoryCells ++ Seq(Name1Cell, TurnoverCell)
         val vatWithIncompleteTurnover = SampleVatUnitWithOnlyMandatoryFields.copy(name = Name1Cell.value,
           turnover = Some(Turnover(
-            amount = Some(TurnoverCell.value.toInt),
+            amount = TurnoverCell.value.toInt,
             date = None
           ))
         )
@@ -163,6 +163,14 @@ class VatHBaseRowMapperSpec extends UnitSpec with MockFactory {
         underTest.fromRow(sampleVatRowWith(cellsIncludingPartialTurnover)) shouldBe Some(vatWithIncompleteTurnover)
       }
 
+      "when turnover is only partially populated (without amount)" in new Fixture {
+        val cellsIncludingPartialTurnover = MandatoryCells ++ Seq(Name1Cell, TurnoverDateCell)
+        val vatWithNoTurnover = SampleVatUnitWithOnlyMandatoryFields.copy(name = Name1Cell.value,
+          turnover = None
+        )
+
+        underTest.fromRow(sampleVatRowWith(cellsIncludingPartialTurnover)) shouldBe Some(vatWithNoTurnover)
+      }
     }
   }
 

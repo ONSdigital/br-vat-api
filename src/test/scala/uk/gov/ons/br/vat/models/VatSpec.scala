@@ -28,7 +28,7 @@ class VatSpec extends UnitSpec {
         withString(named = "recordType", withValue = vat.recordType),
         withOptionalObject(named = "turnover", vat.turnover.fold(EmptyValues) { turnover =>
           Seq(
-            withOptionalInt(named = "amount", withValue = turnover.amount),
+            withInt(named = "amount", withValue = turnover.amount),
             withOptionalString(named = "date", withValue = turnover.date)
           )
         }: _*),
@@ -68,12 +68,11 @@ class VatSpec extends UnitSpec {
 
       "when only some of the turnover fields are defined" in new Fixture {
         val vatWithPartialTurnover = SampleVatUnitWithAllFields.copy(turnover = Some(Turnover(
-          amount = Some(12345), date = None
+          amount = 12345, date = None
         )))
 
         Json.toJson(vatWithPartialTurnover) shouldBe Json.parse(expectedJsonStrOf(vatWithPartialTurnover))
       }
-
     }
   }
 }

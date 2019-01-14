@@ -22,7 +22,7 @@ trait SampleVat {
       deathCode = Some(DeathCode)
     )),
     turnover = Some(Turnover(
-      amount = Some(TurnoverAmount),
+      amount = TurnoverAmount,
       date = Some(TurnoverDate)
     )),
     address = Address(
