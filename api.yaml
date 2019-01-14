@@ -1,0 +1,164 @@
+openapi: 3.0.2
+info:
+  title: Business Registers VAT Service
+  description: Value Added Tax (VAT) Admin Data for Business Registers.
+  contact:
+    name: Business Registers
+  license:
+    name: MIT License
+    url: 'https://github.com/ONSdigital/br-vat-api/blob/master/LICENSE'
+  version: 0.1.0
+servers:
+- url: 'http://localhost:9000'
+  description: Local Development Server
+paths:
+  '/v1/vat/{vatref}':
+    get:
+      tags:
+      - Query
+      summary: Find VAT Admin Unit by VAT Reference
+      description: Returns the single VAT Admin Unit identified by the supplied VAT Reference
+      operationId: getVatByReference
+      parameters:
+      - name: vatref
+        in: path
+        description: VAT Reference of the Admin Unit to retrieve
+        required: true
+        schema:
+          type: string
+          minLength: 12
+          maxLength: 12
+          pattern: '^[0-9]{12}$'
+        example: '123456789012'
+      responses:
+        '200':
+          description: the Admin Unit was found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vat'
+              examples:
+                minimal:
+                  summary: A minimal VAT response
+                  value:
+                    vatref: '123456789012'
+                    name: 'Big Box Cereal Limited'
+                    address:
+                      line1: 'Lane Top Farm'
+                      postcode: 'SS5 4PR'
+                    legalStatus: 'A'
+                    sic: '10020'
+                    recordType: '2'
+        '400':
+          description: the supplied VAT Reference does not adhere to the expected format
+        '404':
+          description: the Admin Unit was not found
+        '500':
+          description: an error has occurred
+        '504':
+          description: a response was not received from the database within the required time interval
+components:
+  schemas:
+    Paye:
+      description: Represents VAT Admin Data
+      type: object
+      required:
+      - vatref
+      - name
+      - address
+      - legalStatus
+      - sic
+      - recordType
+      properties:
+        vatref:
+          type: string
+          example: '065H7Z31732'
+        name:
+          type: string
+          example: 'Big Box Cereal Limited'
+        address:
+          $ref: '#/components/schemas/Address'
+        tradingStyle:
+          type: string
+          example: 'Big Box Cereal'
+        legalStatus:
+          type: string
+          example: 'A'
+        sic:
+          type: string
+          example: '10020'
+        recordType:
+          type: string
+          example: '2'
+        turnover:
+            $ref: '#/components/schemas/Turnover'
+        lifespan:
+          $ref: '#/components/schemas/Lifespan'
+        links:
+          $ref: '#/components/schemas/LinkToLegalUnit'
+    Lifespan:
+      description: Birth & death information
+      type: object
+      required:
+      - birthDate
+      properties:
+        birthDate:
+          type: string
+          format: ddmmyyyy-date
+          example: '05/06/2015'
+        deathDate:
+          type: string
+          format: ddmmyyyy-date
+          example: '09/10/2018'
+        deathCode:
+          type: string
+          example: '658664'
+    Turnover:
+      description: Turnover information
+      type: object
+      properties:
+        amount:
+          type: integer
+          example: 1000
+        date:
+          type: string
+          format: ddmmyyyy-date
+          example: '01/01/2018'
+    Address:
+      description: The unit address
+      type: object
+      required:
+      - line1
+      - postcode
+      properties:
+        line1:
+          type: string
+          example: 'Lane Top Farm'
+        line2:
+          type: string
+          example: '1 Bottom Lane'
+        line3:
+          type: string
+          example: 'Blackshaw Head'
+        line4:
+          type: string
+          example: 'Hebden Bridge'
+        line5:
+          type: string
+          example: 'West Yorkshire'
+        postcode:
+          type: string
+          example: 'SS5 4PR'
+    LinkToLegalUnit:
+      description: Links to parent units
+      type: object
+      required:
+      - ubrn
+      properties:
+        ubrn:
+          description: The UBRN of the parent Legal Unit
+          type: string
+          minLength: 16
+          maxLength: 16
+          pattern: '^[0-9]{16}$'
+          example: '1000012345000999'
