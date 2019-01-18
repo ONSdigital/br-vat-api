@@ -73,6 +73,7 @@ class VatSpec extends UnitSpec {
 
         Json.toJson(vatWithPartialTurnover) shouldBe Json.parse(expectedJsonStrOf(vatWithPartialTurnover))
       }
+
     }
   }
 }

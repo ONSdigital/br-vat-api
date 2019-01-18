@@ -64,6 +64,7 @@ private[hbase] object Columns {
   object Links {
     val ubrn = columnNameForQualifier("ubrn")
   }
+
 }
 
 object VatHBaseRowMapper extends HBaseRowMapper[Vat] {
@@ -116,7 +117,7 @@ object VatHBaseRowMapper extends HBaseRowMapper[Vat] {
       optDate = optionalStringNamed(date).apply(fields)
     } yield Turnover(amount, optDate)
   }
-
+  
   private def toAddress(fields: Map[String, String])(implicit logger: Logger): Option[Address] = {
     import Columns.Address._
     for {

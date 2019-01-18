@@ -27,6 +27,7 @@ class TurnoverSpec extends UnitSpec {
         val turnover = Turnover(amount = 12345, date = None)
         Json.toJson(turnover) shouldBe Json.parse(expectedJsonStrOf(turnover))
       }
+
     }
   }
 }
