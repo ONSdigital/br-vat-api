@@ -171,6 +171,7 @@ class VatHBaseRowMapperSpec extends UnitSpec with MockFactory {
 
         underTest.fromRow(sampleVatRowWith(cellsIncludingPartialTurnover)) shouldBe Some(vatWithNoTurnover)
       }
+
     }
   }
 

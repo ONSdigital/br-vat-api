@@ -17,15 +17,14 @@ class TurnoverSpec extends UnitSpec {
 
   "Turnover" - {
     "can be represented in Turnover" - {
+
       "when all fields are defined" in new Fixture {
         val turnover = Turnover(amount = 12345, date = Some("01/02/2018"))
-
         Json.toJson(turnover) shouldBe Json.parse(expectedJsonStrOf(turnover))
       }
 
       "when only some fields are defined" in new Fixture {
         val turnover = Turnover(amount = 12345, date = None)
-
         Json.toJson(turnover) shouldBe Json.parse(expectedJsonStrOf(turnover))
       }
     }
