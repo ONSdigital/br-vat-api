@@ -161,7 +161,7 @@ pipeline {
                     sh "mv ${distDir}*.zip ${distDir}${env.SVC_NAME}.zip"
                 }
                 dir('config') {
-                    git url: "${GITLAB_URL}/StatBusReg/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
+                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
                 }
                 lock("${this.env.SPACE.toLowerCase()}-${this.env.SVC_NAME}"){
                     script {
@@ -213,7 +213,7 @@ pipeline {
                     sh "mv ${distDir}*.zip ${distDir}${env.SVC_NAME}.zip"
                 }
                 dir('config') {
-                    git url: "${GITLAB_URL}/StatBusReg/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
+                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
                 }
                 lock("${this.env.SPACE.toLowerCase()}-${this.env.SVC_NAME}"){
                     script {
