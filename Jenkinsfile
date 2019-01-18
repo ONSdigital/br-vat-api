@@ -12,7 +12,7 @@ pipeline {
     }
      environment {
         SVC_NAME = "br-vat-api"
-        ORG = "BR"
+        ORG = "SBR"
     }
     options {
         skipDefaultCheckout()
@@ -143,7 +143,7 @@ pipeline {
                 beforeAgent true 
             }
             environment{
-                CREDS = 's_jenkins_sbr_dev'
+                CREDS = 's_jenkins_br_dev'
                 SPACE = 'Dev'
             }
             steps {
@@ -161,7 +161,7 @@ pipeline {
                     sh "mv ${distDir}*.zip ${distDir}${env.SVC_NAME}.zip"
                 }
                 dir('config') {
-                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
+                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsBR__gitlab'
                 }
                 lock("${this.env.SPACE.toLowerCase()}-${this.env.SVC_NAME}"){
                     script {
@@ -195,7 +195,7 @@ pipeline {
                 beforeAgent true 
             }
             environment{
-                CREDS = 's_jenkins_sbr_test'
+                CREDS = 's_jenkins_br_test'
                 SPACE = 'Test'
             }
             steps {
@@ -213,7 +213,7 @@ pipeline {
                     sh "mv ${distDir}*.zip ${distDir}${env.SVC_NAME}.zip"
                 }
                 dir('config') {
-                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsSBR__gitlab'
+                    git url: "${GITLAB_URL}/BusinessRegister/${env.SVC_NAME}.git", credentialsId: 'JenkinsBR__gitlab'
                 }
                 lock("${this.env.SPACE.toLowerCase()}-${this.env.SVC_NAME}"){
                     script {
