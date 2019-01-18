@@ -1,0 +1,10 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+# Note that valid controller parameters are model instances not String values.
+# This requires a PathBindable[T] to be implicitly available on the companion object for each model type T.
+# ~~~~
+
+GET  /v1/vat/$vatRef<[0-9]{12}> uk.gov.ons.br.vat.controllers.VatQueryController.byReference(vatRef: uk.gov.ons.br.vat.models.VatRef)
+GET  /v1/vat/:vatRef                    uk.gov.ons.br.controllers.BadRequestController.badRequest(vatRef)
