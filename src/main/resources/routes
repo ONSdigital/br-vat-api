@@ -6,5 +6,8 @@
 # This requires a PathBindable[T] to be implicitly available on the companion object for each model type T.
 # ~~~~
 
-GET  /v1/vat/$vatRef<[0-9]{12}> uk.gov.ons.br.vat.controllers.VatQueryController.byReference(vatRef: uk.gov.ons.br.vat.models.VatRef)
-GET  /v1/vat/:vatRef                    uk.gov.ons.br.controllers.BadRequestController.badRequest(vatRef)
+GET  /v1/vat/$vatRef<[0-9]{12}>      uk.gov.ons.br.vat.controllers.VatQueryController.byReference(vatRef: uk.gov.ons.br.vat.models.VatRef)
+GET  /v1/vat/:vatRef                 uk.gov.ons.br.controllers.BadRequestController.badRequest(vatRef)
+
+PATCH  /v1/vat/$vatRef<[0-9]{12}>    uk.gov.ons.br.vat.controllers.VatEditController.applyPatch(vatRef: uk.gov.ons.br.vat.models.VatRef)
+PATCH  /v1/vat/:vatRef               uk.gov.ons.br.controllers.BadRequestController.badRequest(vatRef)
