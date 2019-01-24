@@ -7,29 +7,27 @@ info:
   license:
     name: MIT License
     url: 'https://github.com/ONSdigital/br-vat-api/blob/master/LICENSE'
-  version: 0.1.0
+  version: 0.2.0
 servers:
-- url: 'http://localhost:9000'
-  description: Local Development Server
+  - url: 'http://localhost:9000'
+    description: Local Development Server
 paths:
   '/v1/vat/{vatref}':
     get:
       tags:
-      - Query
+        - Query
       summary: Find VAT Admin Unit by VAT Reference
-      description: Returns the single VAT Admin Unit identified by the supplied VAT Reference
+      description: >-
+        Returns the single VAT Admin Unit identified by the supplied VAT
+        Reference
       operationId: getVatByReference
       parameters:
-      - name: vatref
-        in: path
-        description: VAT Reference of the Admin Unit to retrieve
-        required: true
-        schema:
-          type: string
-          minLength: 12
-          maxLength: 12
-          pattern: '^[0-9]{12}$'
-        example: '123456789012'
+        - name: vatref
+          in: path
+          description: VAT Reference of the Admin Unit to retrieve
+          required: true
+          schema:
+            $ref: '#/components/schemas/VatReference'
       responses:
         '200':
           description: the Admin Unit was found
@@ -42,11 +40,11 @@ paths:
                   summary: A minimal VAT response
                   value:
                     vatref: '123456789012'
-                    name: 'Big Box Cereal Limited'
+                    name: Big Box Cereal Limited
                     address:
-                      line1: 'Lane Top Farm'
-                      postcode: 'SS5 4PR'
-                    legalStatus: 'A'
+                      line1: Lane Top Farm
+                      postcode: SS5 4PR
+                    legalStatus: A
                     sic: '10020'
                     recordType: '2'
         '400':
@@ -56,34 +54,94 @@ paths:
         '500':
           description: an error has occurred
         '504':
-          description: a response was not received from the database within the required time interval
+          description: >-
+            a response was not received from the database within the required
+            time interval
+    patch:
+      tags:
+        - Edit
+      summary: Clerically edit a VAT Admin Unit by VAT Reference
+      description: >-
+        Applies a Json Patch specifying edits to the VAT Admin Unit identified
+        by the supplied VAT Reference.  The application restricts which fields
+        can be edited.
+      operationId: patchVatByReference
+      parameters:
+        - name: vatref
+          in: path
+          description: VAT Reference of the Admin Unit to edit
+          required: true
+          schema:
+            $ref: '#/components/schemas/VatReference'
+        - name: X-User-Id
+          in: header
+          description: Id of the editing user
+          required: true
+          schema:
+            type: string
+            example: doej
+      requestBody:
+        description: A Json Patch Specification (RFC6902)
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/PatchSpecification'
+            example:
+              - op: test
+                path: /links/ubrn
+                value: '1234567890123456'
+              - op: replace
+                path: /links/ubrn
+                value: '6543210987654321'
+        required: true
+      responses:
+        '204':
+          description: the edit was applied successfully
+        '400':
+          description: >-
+            the supplied VAT Reference does not adhere to the expected format;
+            the X-User-Id header is unspecified;
+            or the request body does not comply with the Json Patch
+            specification   
+        '404':
+          description: the Admin Unit was not found
+        '409':
+          description: the edit conflicts with a change made by another user
+        '415':
+          description: the request content type is not that of Json Patch
+        '422':
+          description: >-
+            while the request body is a valid Json Patch specification, it does
+            not describe a clerical edit that is supported for VAT admin units
+        '500':
+          description: an error has occurred
 components:
   schemas:
-    Paye:
+    Vat:
       description: Represents VAT Admin Data
       type: object
       required:
-      - vatref
-      - name
-      - address
-      - legalStatus
-      - sic
-      - recordType
+        - vatref
+        - name
+        - address
+        - legalStatus
+        - sic
+        - recordType
       properties:
         vatref:
           type: string
-          example: '065H7Z31732'
+          example: 065H7Z31732
         name:
           type: string
-          example: 'Big Box Cereal Limited'
+          example: Big Box Cereal Limited
         address:
           $ref: '#/components/schemas/Address'
         tradingStyle:
           type: string
-          example: 'Big Box Cereal'
+          example: Big Box Cereal
         legalStatus:
           type: string
-          example: 'A'
+          example: A
         sic:
           type: string
           example: '10020'
@@ -91,7 +149,7 @@ components:
           type: string
           example: '2'
         turnover:
-            $ref: '#/components/schemas/Turnover'
+          $ref: '#/components/schemas/Turnover'
         lifespan:
           $ref: '#/components/schemas/Lifespan'
         links:
@@ -100,16 +158,16 @@ components:
       description: Birth & death information
       type: object
       required:
-      - birthDate
+        - birthDate
       properties:
         birthDate:
           type: string
           format: ddmmyyyy-date
-          example: '05/06/2015'
+          example: 05/06/2015
         deathDate:
           type: string
           format: ddmmyyyy-date
-          example: '09/10/2018'
+          example: 09/10/2018
         deathCode:
           type: string
           example: '658664'
@@ -123,37 +181,37 @@ components:
         date:
           type: string
           format: ddmmyyyy-date
-          example: '01/01/2018'
+          example: 01/01/2018
     Address:
       description: The unit address
       type: object
       required:
-      - line1
-      - postcode
+        - line1
+        - postcode
       properties:
         line1:
           type: string
-          example: 'Lane Top Farm'
+          example: Lane Top Farm
         line2:
           type: string
-          example: '1 Bottom Lane'
+          example: 1 Bottom Lane
         line3:
           type: string
-          example: 'Blackshaw Head'
+          example: Blackshaw Head
         line4:
           type: string
-          example: 'Hebden Bridge'
+          example: Hebden Bridge
         line5:
           type: string
-          example: 'West Yorkshire'
+          example: West Yorkshire
         postcode:
           type: string
-          example: 'SS5 4PR'
+          example: SS5 4PR
     LinkToLegalUnit:
       description: Links to parent units
       type: object
       required:
-      - ubrn
+        - ubrn
       properties:
         ubrn:
           description: The UBRN of the parent Legal Unit
@@ -162,3 +220,44 @@ components:
           maxLength: 16
           pattern: '^[0-9]{16}$'
           example: '1000012345000999'
+    VatReference:
+      description: unique VAT Reference
+      type: string
+      minLength: 12
+      maxLength: 12
+      pattern: '^[0-9]{12}$'
+      example: '123456789012'
+    PatchSpecification:
+      description: >-
+        An array of operations to be applied as a patch to a Json document in
+        accordance with RFC6902
+      type: array
+      items:
+        $ref: '#/components/schemas/PatchOperation'
+    PatchOperation:
+      description: >-
+        Defines an operation to be applied as part of a Json patch. Note that we
+        currently support only a limited subset of the operations defined by the
+        specification, and all of the operations that we do support require a
+        value property.
+      type: object
+      required:
+        - op
+        - path
+        - value
+      properties:
+        op:
+          type: string
+          description: the operation type
+          enum:
+            - test
+            - replace
+          example: test
+        path:
+          type: string
+          description: the document path targeted by this operation
+          example: links/ubrn
+        value:
+          $ref: '#/components/schemas/AnyValue'
+    AnyValue:
+      description: 'Any Json structure - string, number, boolean, array or object'

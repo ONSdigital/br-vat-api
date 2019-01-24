@@ -28,8 +28,6 @@ import scala.util.Try
  * for us.
  */
 private[hbase] object Columns {
-  private val columnNameForQualifier: String => String = HBaseColumn.name(family = "d")
-
   val vatref = columnNameForQualifier("vatref")
   val legalStatus = columnNameForQualifier("legalstatus")
   val sic = columnNameForQualifier("sic92")
@@ -62,9 +60,8 @@ private[hbase] object Columns {
   }
 
   object Links {
-    val ubrn = columnNameForQualifier("ubrn")
+    val ubrn = HBaseColumn.name(ParentLinkColumn)
   }
-
 }
 
 object VatHBaseRowMapper extends HBaseRowMapper[Vat] {

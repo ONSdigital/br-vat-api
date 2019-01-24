@@ -1,7 +1,7 @@
 # Business Register VAT API
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE)
 
-Supports retrieval of Paye As You Earn (VAT) admin data.
+Supports retrieval of Value Added Tax (VAT) admin data.
 
 See the [Open API Specification](./api.yaml) for details of the API.
 
@@ -49,8 +49,7 @@ Generate static analysis report:
 
     followed by the table:
 
-
-
+        create 'br_vat_db:vat', 'd', 'h'
 
 3.  Create Sample Data
 
@@ -107,11 +106,21 @@ Generate static analysis report:
         curl -i http://localhost:9000/v1/vat/123456789012
         curl -i http://localhost:9000/v1/vat/987654321012
 
-7.  Shutdown This Service
+7.  Clerically edit a unit (modifying the existing UBRN)
+
+        curl -i \
+        -H "Content-Type: application/json-patch+json" \
+        -H "X-User-Id: bloggsj" \
+        -d '[{"op": "test", "path": "/links/ubrn", "value": "987654321012-ubrn"},
+             {"op": "replace", "path": "/links/ubrn", "value": "1234567890123456"}]' \
+        -X PATCH \
+        "http://localhost:9000/v1/vat/987654321012"
+
+8.  Shutdown This Service
 
     Terminate the running command (typically Ctrl-C).
 
-8.  TearDown Database
+9.  TearDown Database
 
     Delete the table:
 
@@ -122,13 +131,19 @@ Generate static analysis report:
 
         drop_namespace 'br_vat_db'
 
-9.  Shutdown HBase REST Service
+10.  Shutdown HBase REST Service
 
         bin/hbase rest stop
 
-10.  Shutdown HBase
+11.  Shutdown HBase
 
          bin/hbase stop-hbase.sh
+
+
+### API Specification
+The `api.yaml` file in the root project directory documents the API using the [Open API Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md).
+This file is best edited using [Swagger Editor](https://github.com/swagger-api/swagger-editor) and best viewed using [Swagger UI](https://github.com/swagger-api/swagger-ui/).
+The Docker approach outlined [here](https://github.com/swagger-api/swagger-editor#docker) seems to work well.
 
 
 ### Tracing
@@ -169,3 +184,20 @@ that is defined at `src/it/resources/it_application.conf`.  This imports the sta
 overrides the environment to that expected by locally executing acceptance tests.  This allows us to specify
 non-standard ports for example, to avoid conflicts with locally running services.  For this to work, the
 build file overrides the `-Dconfig.resource` setting when executing the IntegrationTest phase.
+
+
+### Edit History
+A history of edits is maintained in a separate 'h' column family.
+
+For each edit a new history cell is created.  The column name of this cell is a UUID, and the cell value
+has the format:
+
+    {userId}~{iso-local-date-time}~{old-ubrn}~{new-ubrn}
+
+For example:
+
+    column=h:90731d6b-d98f-450b-871d-806d13901953,
+    value=bloggsj~2019-01-23T09:22:39.264~1234567890123456~9999999999999999
+
+Metadata for the edit (currently the editedBy userId) must be supplied by HTTP Headers (currently `X-User-Id`).
+Any `PATCH` request without the required metadata headers will receive a `Bad Request (400)` response.
